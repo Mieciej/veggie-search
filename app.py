@@ -1,0 +1,91 @@
+import glob
+MODELS = ["MACIEK1.keras"]
+N_IMAGES = 3000
+import numpy as np
+import os.path
+
+model_features = {}
+model_imagenames = {}
+image_filenames = []
+cache = set()
+
+def Add_Features(model_name, imagename, features):
+    model_features.setdefault(model_name, []).append(features)
+    model_imagenames.setdefault(model_name, []).append(imagename)
+    cache.add((model_name, imagename))
+
+
+if os.path.isfile("cache.ini"):
+    with open("cache.ini", "r") as file:
+        curr_model = None
+        n = 0
+        for line in file.readlines():
+            if line[0] == "[" and line[len(line)-2] == "]":
+                curr_model = line.removesuffix("]\n").removeprefix("[")
+            else:
+                assert curr_model != None
+                imagename, text_arr = line.split("=")
+                text_arr = text_arr.removeprefix("[").removesuffix("]\n")
+                text_arr = text_arr.split(" ")
+                arr = np.zeros((1024,))
+                for i, value in enumerate(text_arr):
+                    arr[i] = float(value)
+                Add_Features(curr_model, imagename, arr)
+                n += 1
+    print(f"Loaded {n} image features from cache")
+
+
+
+from tensorflow.keras.preprocessing import image
+import tensorflow as tf
+import keras
+
+models = {}
+for model_name in MODELS:
+    model = tf.keras.models.load_model(model_name)
+    feature_extractor = tf.keras.Model(
+        inputs=model.input,
+        outputs=model.get_layer('features').output
+    )
+    models[model_name] = feature_extractor
+
+
+new_featues = False
+i = 0
+for filename in glob.glob("veggie-images/validation/*/*"):
+    try:
+        if i >= N_IMAGES: 
+            break
+        img = image.load_img(filename, target_size=(224, 224))
+        img_array = image.img_to_array(img)
+        img_array = keras.ops.expand_dims(img_array, axis=0)
+        for model_name, model in models.items():
+            if (model_name, filename) in cache:
+                continue
+            prediction = model.predict(img_array).reshape((1024, ))
+            Add_Features(model_name, filename, prediction)
+            new_featues = True
+            i+=1
+    except KeyboardInterrupt:
+        print(f"Read features of {i} new images")
+        break
+
+
+if new_featues:
+    # print whole length of array to file
+    np.set_printoptions()
+    with open("cache.ini", "w+") as cache_file:
+        for model_name, features in model_features.items():
+            cache_file.write(f"[{model_name}]\n")
+            image_names = model_imagenames[model_name]
+            for i, image_features in enumerate(features):
+                cache_file.write(f"{image_names[i]}=")
+                # because built-in numpy methods are disappointingly bad
+                str_arr="["
+                for n in image_features:
+                    str_arr += str(n) + " "
+
+                cache_file.write(str_arr[:-1]+"]\n")
+
+    np.set_printoptions()
+
