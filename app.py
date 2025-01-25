@@ -1,8 +1,9 @@
 import glob
-MODELS = ["MACIEK1.keras"]
+MODELS = ["MACIEK1.keras", "KUBA1.keras"]
 N_IMAGES = 3000
 import numpy as np
 import os.path
+import sys
 
 model_features = {}
 model_imagenames = {}
@@ -42,38 +43,40 @@ import keras
 
 models = {}
 for model_name in MODELS:
-    model = tf.keras.models.load_model(model_name)
+    model = tf.keras.models.load_model("./models/"+model_name)
     feature_extractor = tf.keras.Model(
         inputs=model.input,
         outputs=model.get_layer('features').output
     )
     models[model_name] = feature_extractor
+    print("Loaded model:", model_name)
 
 
 new_featues = False
 i = 0
+print("Looking for new images...")
 for filename in glob.glob("veggie-images/validation/*/*"):
     try:
         if i >= N_IMAGES: 
             break
-        img = image.load_img(filename, target_size=(224, 224))
-        img_array = image.img_to_array(img)
-        img_array = keras.ops.expand_dims(img_array, axis=0)
+        img_array = None
         for model_name, model in models.items():
             if (model_name, filename) in cache:
                 continue
+            if not img_array:
+                img = image.load_img(filename, target_size=(224, 224))
+                img_array = image.img_to_array(img)
+                img_array = keras.ops.expand_dims(img_array, axis=0)
             prediction = model.predict(img_array).reshape((1024, ))
             Add_Features(model_name, filename, prediction)
             new_featues = True
             i+=1
     except KeyboardInterrupt:
-        print(f"Read features of {i} new images")
         break
-
+print(f"Read features of {i} new images")
 
 if new_featues:
     # print whole length of array to file
-    np.set_printoptions()
     with open("cache.ini", "w+") as cache_file:
         for model_name, features in model_features.items():
             cache_file.write(f"[{model_name}]\n")
@@ -84,8 +87,29 @@ if new_featues:
                 str_arr="["
                 for n in image_features:
                     str_arr += str(n) + " "
-
                 cache_file.write(str_arr[:-1]+"]\n")
 
-    np.set_printoptions()
+
+for model in model_features:
+    model_features[model]=np.array(model_features[model])
+
+if len(sys.argv) != 2:
+    print("Too few arguments", file=sys.stderr)
+    exit(1)
+
+
+img = image.load_img(sys.argv[1], target_size=(224, 224))
+img_array = image.img_to_array(img)
+img_array = keras.ops.expand_dims(img_array, axis=0)
+for model in model_features:
+    q = models[model].predict(img_array).reshape((1024,))
+    f = model_features[model]
+    fl = np.linalg.norm(f, axis=1)
+    ql = np.linalg.norm(q)
+    similarity = np.sum(q * f, axis=1) / (fl * ql)
+    order = sorted(range(len(similarity)), key = lambda x : similarity[x], reverse=True)
+    print("Most similar images")
+    for i in range(5):
+        print(model_imagenames[model_name][order[i]], similarity[order])
+
 
