@@ -5,7 +5,7 @@ from tensorflow.keras.models import Model
 from keras import layers
 from tensorflow.keras.layers import Input
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
-from tensorflow.keras.applications import EfficientNetB0
+from tensorflow.keras.applications import ResNet50
 from tensorflow.keras.optimizers import Adam
 
 
@@ -32,8 +32,8 @@ validation_dataset = tf.keras.preprocessing.image_dataset_from_directory(
     label_mode="categorical"
 )
 
-def train_efficientnet():
-    base_model = EfficientNetB0(include_top=False, input_shape=(224, 224, 3))
+def train_resnet():
+    base_model = ResNet50(include_top=False, input_shape=(224, 224, 3))
     base_model.trainable = False
 
     inputs = Input(shape=(224, 224, 3))
@@ -57,13 +57,13 @@ def train_efficientnet():
         validation_data=validation_dataset,
         epochs=30,
         callbacks=[
-            ModelCheckpoint('KUBA2.keras', save_best_only=True),
+            ModelCheckpoint('KUBA3.keras', save_best_only=True),
             EarlyStopping(patience=5, restore_best_weights=True)
         ])
     
     return history
 
 if __name__ == '__main__':
-    history = train_efficientnet()
+    history = train_resnet()
     history_df = pd.DataFrame(history.history)
-    history_df.to_csv('efficientnet-history.csv', index=False)
+    history_df.to_csv('resnet-history.csv', index=False)
