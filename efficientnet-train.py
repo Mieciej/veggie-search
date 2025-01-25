@@ -3,7 +3,7 @@ import pandas as pd
 
 from tensorflow.keras.models import Model
 from keras import layers
-from tensorflow.keras.layers import Input, Conv2D, MaxPool2D, Dense, Dropout, Flatten
+from tensorflow.keras.layers import Input
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
 from tensorflow.keras.applications import EfficientNetB0
 from tensorflow.keras.optimizers import Adam
