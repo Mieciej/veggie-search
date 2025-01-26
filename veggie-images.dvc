@@ -1,0 +1,6 @@
+outs:
+- md5: 53d991595df8722944fc834700267acf.dir
+  size: 571741758
+  nfiles: 21001
+  hash: md5
+  path: veggie-images
