@@ -97,8 +97,9 @@ def get_image_order(query_filename, model):
     fl = np.linalg.norm(f, axis=1)
     ql = np.linalg.norm(q)
     similarity = np.sum(q * f, axis=1) / (fl * ql)
+    print(similarity)
     order = sorted(range(len(similarity)), key = lambda x : similarity[x], reverse=True)
     print("Most similar images")
     for i in range(5):
-        print(model_imagenames[model_name][order[i]], similarity[order])
+        print(model_imagenames[model][order[i]], similarity[order[i]])
     return order
