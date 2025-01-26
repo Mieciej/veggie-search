@@ -6,7 +6,7 @@ from tensorflow.keras.preprocessing import image
 import tensorflow as tf
 import keras
 
-MODELS = ["MACIEK1.keras", "KUBA1.keras"]
+MODELS = ["MACIEK1.keras", "KUBA1.keras", "KUBA2.keras", "KUBA3.keras"]
 
 model_features = {}
 model_imagenames = {}
@@ -57,7 +57,7 @@ def load_features():
             for model_name, model in models.items():
                 if (model_name, filename) in cache:
                     continue
-                if not img_array:
+                if img_array is None:
                     img = image.load_img(filename, target_size=(224, 224))
                     img_array = image.img_to_array(img)
                     img_array = keras.ops.expand_dims(img_array, axis=0)
