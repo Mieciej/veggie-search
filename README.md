@@ -9,7 +9,7 @@ _Veggie, Search!_ is an image search project based on [Vegetable Image Dataset](
 ### Model training
 
 To train models run the following script:
-```
+```bash
 ./train_models.sh
 ```
 
@@ -17,6 +17,6 @@ To train models run the following script:
 
 You can use GUI only after training the models.
 To start the GUI run
-```
+```bash
 python app.py
 ```
