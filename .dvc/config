@@ -1,0 +1,4 @@
+[core]
+    remote = maciek_drive
+['remote "maciek_drive"']
+    url = gs://dvc-veggie-search
