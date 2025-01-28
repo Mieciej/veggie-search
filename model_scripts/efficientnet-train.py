@@ -57,7 +57,7 @@ def train_efficientnet():
         validation_data=validation_dataset,
         epochs=30,
         callbacks=[
-            ModelCheckpoint('KUBA2.keras', save_best_only=True),
+            ModelCheckpoint('KUBA1.keras', save_best_only=True),
             EarlyStopping(patience=5, restore_best_weights=True)
         ])
     
