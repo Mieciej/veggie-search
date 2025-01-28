@@ -1,13 +1,22 @@
-### 10 point checklist
+# Veggie, Search!
 
-- [x] git - mandatory
-- [ ] readme - mandatory
-- [ ] report - mandatory
-- [ ] search engine 2p
-- [x] evaluation on dataset on at least 10k images 1p
-- [x] train from zero on own data with own architecture 2p
-- [x] different architecture 1p
-- [ ] data augmentation 1p
-- [ ] docker 1p
-- [ ] GUI 1p
-- [ ] DVC 2p
+_Veggie, Search!_ is an image search project based on [Vegetable Image Dataset](https://www.researchgate.net/publication/352846889_DCNN-Based_Vegetable_Image_Classification_Using_Transfer_Learning_A_Comparative_Study).
+
+
+
+## Usage
+
+### Model training
+
+To train models run the following script:
+```
+./train_models.sh
+```
+
+### GUI
+
+You can use GUI only after training the models.
+To start the GUI run
+```
+python app.py
+```
