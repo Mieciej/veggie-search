@@ -78,7 +78,7 @@ model = get_new_model((224, 224, 3), 15)
 
 epochs = 5
 callbacks = [
-        ModelCheckpoint('save_at_{epoch}.keras')
+        ModelCheckpoint('MACIEK1.keras', save_best_only=True),
         ]
 
 model.compile(optimizer=keras.optimizers.Adam(3e-4),

@@ -73,7 +73,7 @@ def train_custom_model():
         validation_data=validation_dataset,
         epochs=45,
         callbacks=[
-            ModelCheckpoint('vgg16-scratch-model-best.keras', save_best_only=True),
+            ModelCheckpoint('KUBA1.keras', save_best_only=True),
             EarlyStopping(patience=10, restore_best_weights=True)
         ]
     )
