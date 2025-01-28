@@ -102,4 +102,4 @@ def get_image_order(query_filename, model):
     print("Most similar images")
     for i in range(5):
         print(model_imagenames[model][order[i]], similarity[order[i]])
-    return order
+    return order, similarity
