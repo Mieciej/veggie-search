@@ -7,6 +7,7 @@ from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
 
 print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
 
+# source https://keras.io/examples/vision/image_classification_from_scratch/
 def get_new_model(input_shape, num_classes):
     inputs = keras.Input(shape=input_shape)
 
@@ -21,16 +22,11 @@ def get_new_model(input_shape, num_classes):
         x = layers.Activation("relu")(x)
         x = layers.SeparableConv2D(size, 3, padding="same")(x)
         x = layers.BatchNormalization()(x)
-
         x = layers.Activation("relu")(x)
         x = layers.SeparableConv2D(size, 3, padding="same")(x)
         x = layers.BatchNormalization()(x)
-
         x = layers.MaxPooling2D(3, strides=2, padding="same")(x)
-
-        residual = layers.Conv2D(size, 1, strides=2, padding="same")(
-                previous_block_activation
-                )
+        residual = layers.Conv2D(size, 1, strides=2, padding="same")(previous_block_activation)
         x = layers.add([x, residual])
         previous_block_activation = x
 
@@ -39,10 +35,7 @@ def get_new_model(input_shape, num_classes):
     x = layers.Activation("relu")(x)
 
     x = layers.GlobalAveragePooling2D(name='features')(x)
-    if num_classes == 2:
-        units = 1
-    else:
-        units = num_classes
+    units = num_classes
 
     x = layers.Dropout(0.25)(x)
     outputs = layers.Dense(units, activation=None)(x)
