@@ -22,6 +22,7 @@ def main():
     print(models)
     selected_model = 0
 
+
     scroll_y = 0
     scroll_speed = 224/3
     query_img_path = ""
@@ -37,10 +38,10 @@ def main():
             unload_dropped_files(files)
             query_img_path = image_path
             change_order = True
-        if is_key_pressed(KEY_SPACE):
+        if order and is_key_pressed(KEY_SPACE):
             selected_model= (selected_model+1) % len(models)
             change_order = True
-        elif is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+        elif order and is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
             if get_mouse_position().y < (offset - scroll_y):
                 selected_model= (selected_model+1) % len(models)
                 change_order = True
@@ -55,7 +56,7 @@ def main():
         begin_drawing()
         clear_background(background_color)
         if order:
-            draw_text("Model: " + models[selected_model], 10, 10-int(scroll_y) , 32, LIGHTGRAY);
+            draw_text_ex(get_font(32), "Model: " + models[selected_model], Vector2(10, 10-int(scroll_y)) , 32, 3, LIGHTGRAY);
             top_row = max(0, int((scroll_y-offset)//224))
             special_texture = None
             special_pos = None
@@ -76,15 +77,17 @@ def main():
                 draw_texture_ex(t, pos, 0.0, 1.0, WHITE)
             if special_texture is not None:
                 draw_texture_ex(special_texture, special_pos, 0.0, 1.2, WHITE)
-                draw_rectangle(int(special_pos.x), int(special_pos.y + 224 * 1.2), int(224 * 1.2), 44, background_color)
-                draw_text(special_score, int(special_pos.x) + 7, int(special_pos.y + 224 * 1.2) + 10, 20, WHITE)
-                draw_text(name, int(special_pos.x) + 7, int(special_pos.y + 224 * 1.2) + 28, 12, WHITE)
+                draw_rectangle(int(special_pos.x), int(special_pos.y + 224 * 1.2), int(224 * 1.2), 50, background_color)
+                draw_text_ex(get_font(24), special_score, Vector2(int(special_pos.x) + 7, int(special_pos.y + 224 * 1.2) + 7), 24, 2, WHITE)
+                draw_text_ex(get_font(14), special_name, Vector2(int(special_pos.x) + 7, int(special_pos.y + 224 * 1.2) + 30), 14, 1, WHITE)
         else:
-            msg = "Drop image to perform search"
-            draw_text(msg, int(window_width/2 - measure_text(msg, 48)/2), int(window_height/2-24), 48, LIGHTGRAY);
+            msg = "Drag and drop an image to perform search"
+            draw_text_ex(get_font(60), msg, Vector2(int(80), int(window_height/2-50)), 60, 4, LIGHTGRAY);
         end_drawing()
     for _, texture in textures.items():
         unload_texture(texture)
+    for _, font in fonts.items():
+        unload_font(font)
     close_window()
 
 def get_texture(path):
@@ -94,6 +97,17 @@ def get_texture(path):
         texture = load_texture(path)
         textures[path] = texture
         return texture
+
+fonts = {}
+def get_font(size):
+    if size in fonts:
+        return fonts[size]
+    else:
+        font = load_font_ex("open-sans.ttf", size, None, 0)
+        gen_texture_mipmaps(font.texture)
+        set_texture_filter(font.texture, TEXTURE_FILTER_BILINEAR);
+        fonts[size] = font
+        return font
 
 if __name__ == "__main__":
     main()
